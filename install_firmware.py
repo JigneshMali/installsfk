@@ -4,10 +4,6 @@ import tarfile
 import requests
 import stat
 import subprocess
-import CheckUserConfig
-import CheckUserConfigJson
-import re
-import sys
 import xml.etree.ElementTree as ET
 
 
@@ -72,7 +68,7 @@ def extract_version(name):
 
 
 def backup_config():
-    """Backup existing configuration files, if they exist."""
+    """Backup configuration files, if they exist."""
     config_default_file = os.path.join(install_path, "etc", "dbus-serialbattery", "config.default.ini")
     battery_setup_file = os.path.join(install_path, "etc", "dbus-serialbattery", "SFKVirtualBattery", "BatterySetupOptionValue.json")
 
