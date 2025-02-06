@@ -5,6 +5,7 @@ import requests
 import stat
 import subprocess
 import xml.etree.ElementTree as ET
+import re  # Importing the regular expression module
 
 
 # Configuration
