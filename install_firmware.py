@@ -85,23 +85,57 @@ def backup_config():
         shutil.copy(setup_file, os.path.join(backup_dir, "BatterySetupOptionValue.json.backup"))
 
 
+# def extract_firmware():
+#     """Extract firmware to the correct location."""
+#     if not os.path.isfile(firmware_download_path):
+#         print(f"\nFirmware file not found at {firmware_download_path}.")
+#         return
+
+#     print_progress("Extracting firmware...")
+#     extracted_path = os.path.join(install_path, "etc", "dbus-serialbattery")
+
+#     if os.path.exists(extracted_path):
+#         shutil.rmtree(extracted_path)
+
+#     with tarfile.open(firmware_download_path, "r:gz") as tar:
+#         members = [member for member in tar.getmembers() if member.name.startswith("etc/dbus-serialbattery")]
+#         tar.extractall(path=install_path, members=members)
+
+#     print("\nFirmware extracted successfully.")
+
 def extract_firmware():
-    """Extract firmware to the correct location."""
-    if not os.path.isfile(firmware_download_path):
-        print(f"\nFirmware file not found at {firmware_download_path}.")
-        return
+    """Extract driver from firmware archive and restore config if necessary."""
+    firmware_path = "/tmp/venus-data.tar.gz"
+    extract_path = os.path.join(install_path, "etc", "dbus-serialbattery")
+    backup_config_path = os.path.join(install_path, "etc", "dbus-serialbattery_config.ini.backup")
+    config_path = os.path.join(extract_path, "config.ini")
 
-    print_progress("Extracting firmware...")
-    extracted_path = os.path.join(install_path, "etc", "dbus-serialbattery")
+    if os.path.isfile(firmware_path):
+        # Remove old driver
+        print_progress("Removing old driver...")
+        shutil.rmtree(extract_path, ignore_errors=True)
 
-    if os.path.exists(extracted_path):
-        shutil.rmtree(extracted_path)
+        # Extract new firmware
+        print_progress("Extracting driver...")
+        with tarfile.open(firmware_path, "r:gz") as tar:
+            tar.extractall(path=install_path)
 
-    with tarfile.open(firmware_download_path, "r:gz") as tar:
-        members = [member for member in tar.getmembers() if member.name.startswith("etc/dbus-serialbattery")]
-        tar.extractall(path=install_path, members=members)
+    else:
+        print("\nThere is no file in 'venus-data.tar.gz'.")
 
-    print("\nFirmware extracted successfully.")
+        # Restore config.ini if backup exists
+        if os.path.isfile(backup_config_path):
+            print("\nRestoring config.ini from backup...")
+            os.makedirs(extract_path, exist_ok=True)
+            shutil.move(backup_config_path, config_path)
+
+        sys.exit()
+
+    # Run reinstall-local.sh if present
+    reinstall_script = os.path.join(extract_path, "reinstall-local.sh")
+    if os.path.isfile(reinstall_script):
+        print("\nRunning reinstall-local.sh...")
+        subprocess.run(["bash", reinstall_script], check=True)
 
 
 def set_permissions():
@@ -172,7 +206,7 @@ def install_firmware():
             print(f"\nInstalling firmware version {version}...")
             download_firmware(firmware_url)
             backup_config()
-            # extract_firmware()
+            extract_firmware()
             # set_permissions()
             # run_optional_scripts()
             # print(f"\nInstallation of version {version} completed.")
