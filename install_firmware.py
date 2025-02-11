@@ -172,9 +172,9 @@ def install_firmware():
             print(f"\nInstalling firmware version {version}...")
             download_firmware(firmware_url)
             backup_config()
-            extract_firmware()
-            set_permissions()
-            run_optional_scripts()
+            # extract_firmware()
+            # set_permissions()
+            # run_optional_scripts()
             print(f"\nInstallation of version {version} completed.")
 
     print("\nInstallation process finished.")
