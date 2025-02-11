@@ -175,13 +175,13 @@ def install_firmware():
             # extract_firmware()
             # set_permissions()
             # run_optional_scripts()
-            print(f"\nInstallation of version {version} completed.")
+            # print(f"\nInstallation of version {version} completed.")
 
-    print("\nInstallation process finished.")
-    reboot = input("Would you like to reboot now? (y/n): ").strip().lower()
-    if reboot == "y":
-        print("\nRebooting now...")
-        os.system("reboot")
+    # print("\nInstallation process finished.")
+    # reboot = input("Would you like to reboot now? (y/n): ").strip().lower()
+    # if reboot == "y":
+    #     print("\nRebooting now...")
+    #     os.system("reboot")
 
 
 # Start the firmware installation process
