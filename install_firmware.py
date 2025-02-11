@@ -36,13 +36,13 @@ def fetch_driver_info_xml(url):
         response = requests.get(url, timeout=10)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
-        print(f"\n❌ Error fetching XML file: {e}")
+        print(f"\nError fetching XML file: {e}")
         return {}, []
 
     try:
         root = ET.fromstring(response.text)
     except ET.ParseError as e:
-        print(f"\n❌ Error parsing XML: {e}")
+        print(f"\nError parsing XML: {e}")
         return {}, []
 
     for driver in root.findall("DriverName"):
@@ -56,7 +56,7 @@ def fetch_driver_info_xml(url):
                     driver_info[version] = {"link": link, "name": name}
                     driver_versions.append(version)
         except Exception as e:
-            print(f"\n❌ Error processing driver entry: {e}")
+            print(f"\nError processing driver entry: {e}")
 
     return driver_info, driver_versions
 
@@ -88,7 +88,7 @@ def backup_config():
 def extract_firmware():
     """Extract firmware to the correct location."""
     if not os.path.isfile(firmware_download_path):
-        print(f"\n❌ Firmware file not found at {firmware_download_path}.")
+        print(f"\nFirmware file not found at {firmware_download_path}.")
         return
 
     print_progress("Extracting firmware...")
@@ -101,7 +101,7 @@ def extract_firmware():
         members = [member for member in tar.getmembers() if member.name.startswith("etc/dbus-serialbattery")]
         tar.extractall(path=install_path, members=members)
 
-    print("\n✅ Firmware extracted successfully.")
+    print("\nFirmware extracted successfully.")
 
 
 def set_permissions():
@@ -113,7 +113,7 @@ def set_permissions():
                 filepath = os.path.join(root, file)
                 os.chmod(filepath, os.stat(filepath).st_mode | stat.S_IEXEC)
 
-    print("\n✅ Permissions set successfully.")
+    print("\nPermissions set successfully.")
 
 
 def run_optional_scripts():
@@ -122,13 +122,13 @@ def run_optional_scripts():
     for script in ["reinstall-local.sh", "reinstalllocal.sh"]:
         script_path = os.path.join(install_path, "dbus-serialbattery", script)
         if os.path.isfile(script_path):
-            print(f"\n▶ Running {script}...")
+            print(f"\nRunning {script}...")
             subprocess.run(["bash", script_path], check=True)
 
 
 def download_firmware(firmware_url):
     """Download firmware with progress indication."""
-    print("\n📥 Downloading firmware...")
+    print("\nDownloading firmware...")
     response = requests.get(firmware_url, stream=True)
 
     total_size = int(response.headers.get("content-length", 0))
@@ -142,7 +142,7 @@ def download_firmware(firmware_url):
             sys.stdout.write(f"\rDownloading: [{int(percentage)//2 * '=':<50}] {percentage:.2f}%")
             sys.stdout.flush()
 
-    print("\n✅ Download complete.")
+    print("\nDownload complete.")
 
 
 def install_firmware():
@@ -150,18 +150,18 @@ def install_firmware():
     driver_info, driver_versions = fetch_driver_info_xml(xml_url)
 
     if not driver_info:
-        print("⚠ No drivers found in XML.")
+        print("No drivers found in XML.")
         return
 
-    print("\n🔽 Available driver versions:")
+    print("\nAvailable driver versions:")
     for idx, version in enumerate(driver_versions, start=1):
         print(f"  {idx}. {version} - {driver_info[version]['name']}")
 
     try:
-        user_input = input("\n📝 Enter the numbers of versions to install (comma-separated): ")
+        user_input = input("\nEnter the numbers of versions to install (comma-separated): ")
         selected_versions = [int(x) - 1 for x in user_input.split(",")]
     except ValueError:
-        print("❌ Invalid input. Exiting.")
+        print("Invalid input. Exiting.")
         return
 
     for selected_version_idx in selected_versions:
@@ -169,18 +169,18 @@ def install_firmware():
             version = driver_versions[selected_version_idx]
             firmware_url = driver_info[version]["link"]
 
-            print(f"\n🚀 Installing firmware version {version}...")
+            print(f"\nInstalling firmware version {version}...")
             download_firmware(firmware_url)
             backup_config()
             extract_firmware()
             set_permissions()
             run_optional_scripts()
-            print(f"\n🎉 Installation of version {version} completed.")
+            print(f"\nInstallation of version {version} completed.")
 
-    print("\n✅ Installation process finished.")
-    reboot = input("🔄 Would you like to reboot now? (y/n): ").strip().lower()
+    print("\nInstallation process finished.")
+    reboot = input("Would you like to reboot now? (y/n): ").strip().lower()
     if reboot == "y":
-        print("\n🔄 Rebooting now...")
+        print("\nRebooting now...")
         os.system("reboot")
 
 
