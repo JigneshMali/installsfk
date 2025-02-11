@@ -163,7 +163,7 @@ def install_firmware():
     except ValueError:
         print("Invalid input. Exiting.")
         return
-
+# working fine with backup 
     for selected_version_idx in selected_versions:
         if selected_version_idx < len(driver_versions):
             version = driver_versions[selected_version_idx]
