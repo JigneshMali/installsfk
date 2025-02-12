@@ -13,64 +13,57 @@ fetch_driver_info_xml() {
         exit 1
     fi
 
-    DRIVER_NAMES=()
-    DRIVER_LINKS=()
+    # Extract driver names and links
+    declare -A DRIVER_INFO
+    DRIVER_VERSIONS=()
 
     while IFS= read -r line; do
-        if [[ "$line" =~ "<DriverName>" ]]; then
-            DRIVER_ENTRY=$(echo "$line" | sed -n 's|.*<DriverName>\(.*\)</DriverName>.*|\1|p')
-
-            # Split using custom delimiter
-            IFS='|^|' read -r NAME LINK <<< "$DRIVER_ENTRY"
-
-            # Trim spaces and remove any hidden characters
-            NAME=$(echo "$NAME" | xargs)
-            LINK=$(echo "$LINK" | tr -d '\r\n' | xargs)
+        if echo "$line" | grep -q "<DriverName>"; then
+            DRIVER_ENTRY=$(echo "$line" | sed -E 's|.*<DriverName>(.*)</DriverName>.*|\1|')
+            
+            # Properly split using |^| as delimiter
+            NAME=$(echo "$DRIVER_ENTRY" | awk -F '|\\^|' '{print $1}' | xargs)
+            LINK=$(echo "$DRIVER_ENTRY" | awk -F '|\\^|' '{print $2}' | xargs)
 
             if [[ -n "$NAME" && -n "$LINK" ]]; then
-                DRIVER_NAMES+=("$NAME")
-                DRIVER_LINKS+=("$LINK")
+                DRIVER_VERSIONS+=("$NAME")
+                DRIVER_INFO["$NAME"]="$LINK"
             fi
         fi
     done <<< "$XML_CONTENT"
 
-    if [[ ${#DRIVER_NAMES[@]} -eq 0 ]]; then
+    if [[ ${#DRIVER_VERSIONS[@]} -eq 0 ]]; then
         echo "No drivers found."
         exit 1
     fi
 
     echo "Available drivers:"
-    for i in "${!DRIVER_NAMES[@]}"; do
-        echo "$((i+1)). ${DRIVER_NAMES[$i]}"
+    for i in "${!DRIVER_VERSIONS[@]}"; do
+        echo "$((i+1)). ${DRIVER_VERSIONS[$i]}"
     done
-}
 
-# Function to download selected driver
-download_driver() {
-    read -p "Enter the index number of the driver you want to download: " SELECTION
+    # Ask user for selection
+    echo -n "Enter the index number of the driver you want to download: "
+    read -r INDEX
 
-    if ! [[ "$SELECTION" =~ ^[0-9]+$ ]] || (( SELECTION < 1 || SELECTION > ${#DRIVER_NAMES[@]} )); then
-        echo "Invalid selection. Please enter a number between 1 and ${#DRIVER_NAMES[@]}."
+    # Validate input
+    if ! [[ "$INDEX" =~ ^[0-9]+$ ]] || (( INDEX < 1 || INDEX > ${#DRIVER_VERSIONS[@]} )); then
+        echo "Invalid selection."
         exit 1
     fi
 
-    INDEX=$((SELECTION - 1))
-    DOWNLOAD_URL="${DRIVER_LINKS[$INDEX]}"
-    DRIVER_NAME="${DRIVER_NAMES[$INDEX]}"
+    # Get the selected driver name and link
+    SELECTED_DRIVER="${DRIVER_VERSIONS[$((INDEX-1))]}"
+    SELECTED_LINK="${DRIVER_INFO[$SELECTED_DRIVER]}"
 
-    echo "Downloading $DRIVER_NAME..."
-    
-    # Validate if the URL is properly formatted
-    if [[ "$DOWNLOAD_URL" =~ ^https?:// ]]; then
-        echo "Downloading from: $DOWNLOAD_URL"
-        curl -o "/tmp/$(basename "$DOWNLOAD_URL")" -L "$DOWNLOAD_URL"
-        echo "Download completed: /tmp/$(basename "$DOWNLOAD_URL")"
-    else
-        echo "Error: Invalid URL format -> '$DOWNLOAD_URL'"
-        exit 1
-    fi
+    echo "Downloading $SELECTED_DRIVER..."
+    echo "URL: $SELECTED_LINK"
+
+    # Download driver
+    curl -o /tmp/venus-data.tar.gz "$SELECTED_LINK"
+
+    echo "Download completed: /tmp/venus-data.tar.gz"
 }
 
-# Run functions
+# Call function
 fetch_driver_info_xml
-download_driver
