@@ -1,8 +1,11 @@
 #!/bin/bash
 
 # Configuration
+install_path="/data"
+backup_dir="$install_path/etc"
+firmware_download_path="/tmp/venus-data.tar.gz"
+
 URL="https://raw.githubusercontent.com/JigneshMali/installsfk/main/Sfkdriver.xml"
-# URL="https://www.sunfunkits.com/Download/SFKDriverVersion-test.xml"
 FIRMWARE_DOWNLOAD_PATH="/tmp/venus-data.tar.gz"
 
 # Function to fetch and parse XML
@@ -66,3 +69,21 @@ download_driver() {
 }
 
 download_driver
+
+# Extract driver
+if [ -f "$FIRMWARE_DOWNLOAD_PATH" ]; then
+    # Remove old driver
+    rm -rf "$install_path/etc/dbus-serialbattery"
+    tar -zxf "$FIRMWARE_DOWNLOAD_PATH" -C "$install_path"
+else
+    echo "There is no file in \"$FIRMWARE_DOWNLOAD_PATH\""
+    # Restore config.ini
+    if [ -f "$install_path/etc/dbus-serialbattery_config.ini.backup" ]; then
+        mv "$install_path/etc/dbus-serialbattery_config.ini.backup" "$install_path/etc/dbus-serialbattery/config.ini"
+    fi
+    exit
+fi
+
+if [ -f "$install_path/etc/dbus-serialbattery/reinstall-local.sh" ]; then
+    bash "$install_path/etc/dbus-serialbattery/reinstall-local.sh"
+fi
