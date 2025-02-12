@@ -8,6 +8,19 @@ firmware_download_path="/tmp/venus-data.tar.gz"
 URL="https://raw.githubusercontent.com/JigneshMali/installsfk/main/Sfkdriver.xml"
 FIRMWARE_DOWNLOAD_PATH="/tmp/venus-data.tar.gz"
 
+# Backup configuration files
+if [ -f "$install_path/etc/dbus-serialbattery/config.ini" ]; then
+    mv "$install_path/etc/dbus-serialbattery/config.ini" "$install_path/etc/dbus-serialbattery_config.ini.backup"
+fi
+
+if [ -f "$install_path/etc/dbus-serialbattery/config.default.ini" ]; then
+    mv "$install_path/etc/dbus-serialbattery/config.default.ini" "$install_path/etc/dbus-serialbattery_config.default.ini.backup"
+fi
+
+if [ -f "$install_path/etc/dbus-serialbattery/SFKVirtualBattery/BatterySetupOptionValue.json" ]; then
+    mv "$install_path/etc/dbus-serialbattery/SFKVirtualBattery/BatterySetupOptionValue.json" "$install_path/etc/BatterySetupOptionValue.json.backup"
+fi
+
 # Function to fetch and parse XML
 download_driver() {
     echo "Fetching driver details from XML..."
@@ -77,10 +90,6 @@ if [ -f "$FIRMWARE_DOWNLOAD_PATH" ]; then
     tar -zxf "$FIRMWARE_DOWNLOAD_PATH" -C "$install_path"
 else
     echo "There is no file in \"$FIRMWARE_DOWNLOAD_PATH\""
-    # Restore config.ini
-    if [ -f "$install_path/etc/dbus-serialbattery_config.ini.backup" ]; then
-        mv "$install_path/etc/dbus-serialbattery_config.ini.backup" "$install_path/etc/dbus-serialbattery/config.ini"
-    fi
     exit
 fi
 
