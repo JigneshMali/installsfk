@@ -30,7 +30,7 @@ fetch_driver_info_xml() {
             fi
         fi
     done <<< "$XML_CONTENT"
-
+#--
     if [[ ${#DRIVER_VERSIONS[@]} -eq 0 ]]; then
         echo "No drivers found."
         exit 1
