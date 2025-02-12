@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Define URL
+# Define XML URL
 URL="https://www.sunfunkits.com/Download/SFKDriverVersion-test.xml"
 
 # Function to fetch and parse driver info from XML
@@ -20,10 +20,10 @@ fetch_driver_info_xml() {
     while IFS= read -r line; do
         if echo "$line" | grep -q "<DriverName>"; then
             DRIVER_ENTRY=$(echo "$line" | sed -E 's|.*<DriverName>(.*)</DriverName>.*|\1|')
-            
+
             # Properly split using |^| as delimiter
-            NAME=$(echo "$DRIVER_ENTRY" | awk -F '|\\^|' '{print $1}' | xargs)
-            LINK=$(echo "$DRIVER_ENTRY" | awk -F '|\\^|' '{print $2}' | xargs)
+            NAME=$(echo "$DRIVER_ENTRY" | awk -F '[|][\^][|]' '{print $1}' | xargs)
+            LINK=$(echo "$DRIVER_ENTRY" | awk -F '[|][\^][|]' '{print $2}' | xargs)
 
             if [[ -n "$NAME" && -n "$LINK" ]]; then
                 DRIVER_VERSIONS+=("$NAME")
