@@ -4,7 +4,7 @@
 INSTALL_PATH="/data"
 BACKUP_DIR="$INSTALL_PATH/etc"
 FIRMWARE_DOWNLOAD_PATH="/tmp/venus-data.tar.gz"
-XML_URL="https://www.sunfunkits.com/Download/SFKDriverVersion.xml"
+XML_URL="https://www.sunfunkits.com/Download/SFKDriverVersion-test.xml"
 
 # Function to fetch and parse driver info from XML
 # Function to fetch and parse XML
