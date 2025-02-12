@@ -181,17 +181,17 @@ def install_firmware():
     #     print("Invalid input. Exiting.")
     #     return
     while True:
-    user_input = input("\nEnter the numbers of versions to install (comma-separated): ")
-    try:
-        selected_versions = [int(x.strip()) - 1 for x in user_input.split(",")]
-        
-        # Ensure all selected versions are within range
-        if all(0 <= idx < len(driver_versions) for idx in selected_versions):
-            break
-        else:
-            print("Invalid selection. Please choose only from the available options.")
-    except ValueError:
-        print("Invalid input. Please enter numbers separated by commas.")
+        user_input = input("\nEnter the numbers of versions to install (comma-separated): ")
+        try:
+            selected_versions = [int(x.strip()) - 1 for x in user_input.split(",")]
+            
+            # Ensure all selected versions are within range
+            if all(0 <= idx < len(driver_versions) for idx in selected_versions):
+                break
+            else:
+                print("Invalid selection. Please choose only from the available options.")
+        except ValueError:
+            print("Invalid input. Please enter numbers separated by commas.")
 
 # working fine with backup 
     for selected_version_idx in selected_versions:
