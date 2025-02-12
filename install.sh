@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define URL
-URL="https://www.sunfunkits.com/Download/SFKDriverVersion-test.xml"
+URL="https://www.sunfunkits.com/Download/SFKDriverVersion.xml"
 
 # Function to fetch and parse driver info from XML
 fetch_driver_info_xml() {
@@ -20,12 +20,12 @@ fetch_driver_info_xml() {
         if [[ "$line" =~ "<DriverName>" ]]; then
             DRIVER_ENTRY=$(echo "$line" | sed -n 's|.*<DriverName>\(.*\)</DriverName>.*|\1|p')
 
-            # Properly split the entry using IFS
+            # Split using custom delimiter
             IFS='|^|' read -r NAME LINK <<< "$DRIVER_ENTRY"
 
-            # Trim spaces and newlines
+            # Trim spaces and remove any hidden characters
             NAME=$(echo "$NAME" | xargs)
-            LINK=$(echo "$LINK" | xargs)
+            LINK=$(echo "$LINK" | tr -d '\r\n' | xargs)
 
             if [[ -n "$NAME" && -n "$LINK" ]]; then
                 DRIVER_NAMES+=("$NAME")
@@ -62,10 +62,11 @@ download_driver() {
     
     # Validate if the URL is properly formatted
     if [[ "$DOWNLOAD_URL" =~ ^https?:// ]]; then
+        echo "Downloading from: $DOWNLOAD_URL"
         curl -o "/tmp/$(basename "$DOWNLOAD_URL")" -L "$DOWNLOAD_URL"
         echo "Download completed: /tmp/$(basename "$DOWNLOAD_URL")"
     else
-        echo "Error: Invalid URL format -> $DOWNLOAD_URL"
+        echo "Error: Invalid URL format -> '$DOWNLOAD_URL'"
         exit 1
     fi
 }
