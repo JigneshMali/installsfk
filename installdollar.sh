@@ -9,9 +9,9 @@ URL="https://raw.githubusercontent.com/JigneshMali/installsfk/main/Sfkdriver.xml
 FIRMWARE_DOWNLOAD_PATH="/tmp/venus-data.tar.gz"
 
 # Backup configuration files
-if [ -f "$install_path/etc/dbus-serialbattery/config.ini" ]; then
-    mv "$install_path/etc/dbus-serialbattery/config.ini" "$install_path/etc/dbus-serialbattery_config.ini.backup"
-fi
+# if [ -f "$install_path/etc/dbus-serialbattery/config.ini" ]; then
+#     mv "$install_path/etc/dbus-serialbattery/config.ini" "$install_path/etc/dbus-serialbattery_config.ini.backup"
+# fi
 
 if [ -f "$install_path/etc/dbus-serialbattery/config.default.ini" ]; then
     mv "$install_path/etc/dbus-serialbattery/config.default.ini" "$install_path/etc/dbus-serialbattery_config.default.ini.backup"
