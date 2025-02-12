@@ -24,7 +24,7 @@ fetch_driver_info_xml() {
             LINK=$(echo "$DRIVER_ENTRY" | cut -d '|^|' -f2 | xargs)
 
             if [[ -n "$NAME" && -n "$LINK" ]]; then
-                VERSION=$(echo "$NAME" | grep -oP 'v\d+\.\d+\d*' || echo "Unknown")
+                VERSION=$(echo "$NAME" | grep -oP 'v[0-9]+\\.[0-9]+[0-9]*' || echo "Unknown")
                 DRIVER_INFO["$VERSION"]="$LINK"
                 DRIVER_VERSIONS+=("$VERSION")
             fi
@@ -43,4 +43,4 @@ fetch_driver_info_xml() {
 }
 
 # Call function
-fetch_driver_info_xml()
+fetch_driver_info_xml
