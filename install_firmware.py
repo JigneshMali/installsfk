@@ -13,7 +13,8 @@ import time
 install_path = "/data"
 backup_dir = os.path.join(install_path, "etc")
 firmware_download_path = "/tmp/venus-data.tar.gz"
-xml_url = "https://www.sunfunkits.com/Download/SFKDriverVersion.xml"
+# xml_url = "https://www.sunfunkits.com/Download/SFKDriverVersion.xml"
+xml_url = "https://www.sunfunkits.com/Download/SFKDriverVersion-test.xml"
 
 
 def print_progress(message, delay=0.5):
