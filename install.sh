@@ -19,18 +19,18 @@ fetch_driver_info_xml() {
 
     while IFS= read -r line; do
         if echo "$line" | grep -q "<DriverName>"; then
-            DRIVER_ENTRY=$(echo "$line" | sed -E 's|.*<DriverName>(.*)</DriverName>.*|\1|')
-            NAME=$(echo "$DRIVER_ENTRY" | cut -d '|^|' -f1 | xargs)
-            LINK=$(echo "$DRIVER_ENTRY" | cut -d '|^|' -f2 | xargs)
+            DRIVER_ENTRY=$(echo "$line" | sed -n 's|.*<DriverName>\(.*\)</DriverName>.*|\1|p')
+            NAME=$(echo "$DRIVER_ENTRY" | awk -F '\\|\\^\\|' '{print $1}' | xargs)
+            LINK=$(echo "$DRIVER_ENTRY" | awk -F '\\|\\^\\|' '{print $2}' | xargs)
 
             if [[ -n "$NAME" && -n "$LINK" ]]; then
-                VERSION=$(echo "$NAME" | grep -oP 'v[0-9]+\\.[0-9]+[0-9]*' || echo "Unknown")
+                VERSION=$(echo "$NAME" | grep -oP 'v[0-9]+\.[0-9]+[0-9]*' || echo "Unknown")
                 DRIVER_INFO["$VERSION"]="$LINK"
                 DRIVER_VERSIONS+=("$VERSION")
             fi
         fi
     done <<< "$XML_CONTENT"
-#--
+
     if [[ ${#DRIVER_VERSIONS[@]} -eq 0 ]]; then
         echo "No drivers found."
         exit 1
