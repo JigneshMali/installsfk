@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Configuration
-URL="https://raw.githubusercontent.com/JigneshMali/installsfk/main/Sfkdriver.xml"
-# URL="https://www.sunfunkits.com/Download/SFKDriverVersion-test.xml"
+# URL="https://raw.githubusercontent.com/JigneshMali/installsfk/main/Sfkdriver.xml"
+URL="https://www.sunfunkits.com/Download/SFKDriverVersion-test.xml"
 FIRMWARE_DOWNLOAD_PATH="/tmp/venus-data.tar.gz"
 
 # Function to fetch and parse XML
@@ -25,8 +25,8 @@ download_driver() {
     while IFS= read -r line; do
         if echo "$line" | grep -q "<DriverName>"; then
             ENTRY=$(echo "$line" | sed -E 's|.*<DriverName>(.*)</DriverName>.*|\1|')
-            NAME=$(echo "$ENTRY" | awk -F "\$" '{print $1}' | xargs)
-            LINK=$(echo "$ENTRY" | awk -F "\$" '{print $2}' | xargs)
+            NAME=$(echo "$ENTRY" | awk -F "\|\^\|" '{print $1}' | xargs)
+            LINK=$(echo "$ENTRY" | awk -F "\|\^\|" '{print $2}' | xargs)
 
             if [[ -n "$NAME" && -n "$LINK" ]]; then
                 DRIVER_NAMES+=("$NAME")
