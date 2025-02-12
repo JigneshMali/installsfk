@@ -13,34 +13,56 @@ fetch_driver_info_xml() {
         exit 1
     fi
 
-    # Extract driver names and links
-    declare -A DRIVER_INFO
-    DRIVER_VERSIONS=()
+    DRIVER_NAMES=()
+    DRIVER_LINKS=()
 
     while IFS= read -r line; do
-        if echo "$line" | grep -q "<DriverName>"; then
+        if [[ "$line" =~ "<DriverName>" ]]; then
             DRIVER_ENTRY=$(echo "$line" | sed -n 's|.*<DriverName>\(.*\)</DriverName>.*|\1|p')
-            NAME=$(echo "$DRIVER_ENTRY" | awk -F '\\|\\^\\|' '{print $1}' | xargs)
-            LINK=$(echo "$DRIVER_ENTRY" | awk -F '\\|\\^\\|' '{print $2}' | xargs)
+
+            # Use IFS to split on "|^|"
+            IFS='|^|' read -r NAME LINK <<< "$DRIVER_ENTRY"
+
+            NAME=$(echo "$NAME" | xargs)  # Trim spaces
+            LINK=$(echo "$LINK" | xargs)  # Trim spaces
 
             if [[ -n "$NAME" && -n "$LINK" ]]; then
-                VERSION=$(echo "$NAME" | grep -oP 'v[0-9]+\.[0-9]+[0-9]*' || echo "Unknown")
-                DRIVER_INFO["$VERSION"]="$LINK"
-                DRIVER_VERSIONS+=("$VERSION")
+                DRIVER_NAMES+=("$NAME")
+                DRIVER_LINKS+=("$LINK")
             fi
         fi
     done <<< "$XML_CONTENT"
 
-    if [[ ${#DRIVER_VERSIONS[@]} -eq 0 ]]; then
+    if [[ ${#DRIVER_NAMES[@]} -eq 0 ]]; then
         echo "No drivers found."
         exit 1
     fi
 
-    echo "Available driver versions:"
-    for i in "${!DRIVER_VERSIONS[@]}"; do
-        echo "$((i+1)). ${DRIVER_VERSIONS[$i]}"
+    echo "Available drivers:"
+    for i in "${!DRIVER_NAMES[@]}"; do
+        echo "$((i+1)). ${DRIVER_NAMES[$i]}"
     done
 }
 
-# Call function
+# Function to download selected driver
+download_driver() {
+    read -p "Enter the index number of the driver you want to download: " SELECTION
+
+    if ! [[ "$SELECTION" =~ ^[0-9]+$ ]] || (( SELECTION < 1 || SELECTION > ${#DRIVER_NAMES[@]} )); then
+        echo "Invalid selection. Please enter a number between 1 and ${#DRIVER_NAMES[@]}."
+        exit 1
+    fi
+
+    INDEX=$((SELECTION - 1))
+    DOWNLOAD_URL="${DRIVER_LINKS[$INDEX]}"
+    DRIVER_NAME="${DRIVER_NAMES[$INDEX]}"
+
+    echo "Downloading $DRIVER_NAME..."
+    curl -o "/tmp/$(basename "$DOWNLOAD_URL")" -L "$DOWNLOAD_URL"
+
+    echo "Download completed: /tmp/$(basename "$DOWNLOAD_URL")"
+}
+
+# Run functions
 fetch_driver_info_xml
+download_driver
