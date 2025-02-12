@@ -2,6 +2,7 @@
 
 # Configuration
 URL="https://raw.githubusercontent.com/JigneshMali/installsfk/main/Sfkdriver.xml"
+# URL="https://www.sunfunkits.com/Download/SFKDriverVersion-test.xml"
 FIRMWARE_DOWNLOAD_PATH="/tmp/venus-data.tar.gz"
 
 # Function to fetch and parse XML
