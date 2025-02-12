@@ -2,6 +2,7 @@
 
 # Define XML URL
 URL="https://www.sunfunkits.com/Download/SFKDriverVersion-test.xml"
+# https://www.sunfunkits.com/Download/SFKDriverVersion-test.xml
 
 # Function to fetch and parse driver info from XML
 fetch_driver_info_xml() {
