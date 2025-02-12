@@ -86,24 +86,6 @@ def backup_config():
         shutil.copy(setup_file, os.path.join(backup_dir, "BatterySetupOptionValue.json.backup"))
 
 
-# def extract_firmware():
-#     """Extract firmware to the correct location."""
-#     if not os.path.isfile(firmware_download_path):
-#         print(f"\nFirmware file not found at {firmware_download_path}.")
-#         return
-
-#     print_progress("Extracting firmware...")
-#     extracted_path = os.path.join(install_path, "etc", "dbus-serialbattery")
-
-#     if os.path.exists(extracted_path):
-#         shutil.rmtree(extracted_path)
-
-#     with tarfile.open(firmware_download_path, "r:gz") as tar:
-#         members = [member for member in tar.getmembers() if member.name.startswith("etc/dbus-serialbattery")]
-#         tar.extractall(path=install_path, members=members)
-
-#     print("\nFirmware extracted successfully.")
-
 def extract_firmware():
     """Extract driver from firmware archive and restore config if necessary."""
     firmware_path = "/tmp/venus-data.tar.gz"
