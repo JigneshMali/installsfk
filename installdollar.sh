@@ -28,8 +28,8 @@ download_driver() {
     while IFS= read -r line; do
         if echo "$line" | grep -q "<DriverName>"; then
             ENTRY=$(echo "$line" | sed -E 's|.*<DriverName>(.*)</DriverName>.*|\1|')
-            NAME=$(echo "$ENTRY" | awk -F "\$" '{print $1}' | xargs)
-            LINK=$(echo "$ENTRY" | awk -F "\$" '{print $2}' | xargs)
+            NAME=$(echo "$ENTRY" | awk -F "$" '{print $1}' | xargs)
+            LINK=$(echo "$ENTRY" | awk -F "$" '{print $2}' | xargs)
 
             if [[ -n "$NAME" && -n "$LINK" ]]; then
                 DRIVER_NAMES+=("$NAME")
@@ -86,4 +86,13 @@ fi
 
 if [ -f "$install_path/etc/dbus-serialbattery/reinstall-local.sh" ]; then
     bash "$install_path/etc/dbus-serialbattery/reinstall-local.sh"
+fi
+
+# Ask for reboot
+read -p "Driver installation completed. Do you want to reboot now? (y/N): " reboot_choice
+if [[ "$reboot_choice" =~ ^[Yy]$ ]]; then
+    echo "Rebooting now..."
+    reboot
+else
+    echo "Reboot skipped. You may need to restart manually."
 fi
