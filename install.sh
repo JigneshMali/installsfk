@@ -71,8 +71,8 @@ install_firmware() {
     download_firmware "$firmware_url" || return 1
     backup_config
     extract_firmware || return 1
-    set_permissions
-    run_optional_scripts
+  #  set_permissions
+  #  run_optional_scripts
     echo "\nInstallation completed."
 }
 
